@@ -59,7 +59,7 @@ public class Tela extends JFrame {
 			public void mouseReleased(MouseEvent arg0) {
 				File a =new Arquivo().escolherArquivos();
 				try {
-					manipularExcel(a.getAbsolutePath());
+					String[][] b = manipularExcel(a.getAbsolutePath());
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -89,7 +89,7 @@ public class Tela extends JFrame {
 	
 	
 
-	public void manipularExcel(String path) throws IOException{
+	public String[][] manipularExcel(String path) throws IOException{
 		
 		ArrayList<String[]> linhas = new ArrayList<String[]>();
 		
@@ -106,12 +106,72 @@ public class Tela extends JFrame {
 	        }
 	        buffRead.close();
 		
+	        //Reduz o .csv as linhas que são importantes para as regras
+	        String[][] matrizDados = new String [linhas.size()][13];
+	        int contadorLinhas = 0;
+	        int contadorColunas = 0;
 	        
 	        for (String[] i : linhas) {
+	        	contadorColunas = 0;
 	        	for (String colunas : i) {
-	        		System.out.print(colunas +" ");	
+	        		switch(contadorColunas){
+	        		//modalidade
+	        		case 2:
+	        			matrizDados[contadorLinhas][0] = colunas;
+	        		//valor
+	        		case 4:
+	        			matrizDados[contadorLinhas][1] = colunas;
+	        		//qtde participantes
+	        		case 10:
+	        			matrizDados[contadorLinhas][2] = colunas;
+	        		//UG
+	        		case 13:
+	        			matrizDados[contadorLinhas][3] = colunas;
+	        		//fornecedor
+	        		case 19: 
+	        			matrizDados[contadorLinhas][4] = colunas;
+	        		//colocação do vencedor
+	        		case 20:
+	        			matrizDados[contadorLinhas][5] = colunas;
+	        		//valor do item
+	        		case 21:
+	        			matrizDados[contadorLinhas][6] = colunas;
+	        		//sigla UG
+	        		case 23: 
+	        			matrizDados[contadorLinhas][7] = colunas;
+	        		//nome modalidade
+	        		case 24:
+	        			matrizDados[contadorLinhas][8] = colunas;
+	        		//cod item
+	        		case 28:
+	        			matrizDados[contadorLinhas][9] = colunas;
+	        		//nome item
+	        		case 30:
+	        			matrizDados[contadorLinhas][10] = colunas;
+	        		//razão social
+	        		case 38:
+	        			matrizDados[contadorLinhas][11] = colunas;
+	        		//cnpj
+	        		case 40:
+	        			matrizDados[contadorLinhas][12] = colunas;
+	        		}
+	        		contadorColunas++;
 	        	}
-	        	System.out.println();//pular linha	        		
+	        	contadorLinhas++;
 	        }
+	        int qtdeColunas = matrizDados[0].length;
+			int qtdeLinhas = matrizDados.length;
+			
+			System.out.println(qtdeLinhas + " " + qtdeColunas);
+	return matrizDados;        
 	}
+	
+	public void testarDados(String[][] dados){
+		int qtdeColunas = dados[0].length;
+		int qtdeLinhas = dados.length;
+		
+		System.out.println(qtdeLinhas + qtdeColunas);
+		
+	}
+	
 }
