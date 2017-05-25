@@ -61,7 +61,7 @@ public class Tela extends JFrame {
 				try {
 					String[][] b = manipularExcel(a.getAbsolutePath());
 					ArrayList<String> ugs = identificadorUG(b);
-					//ArrayList<String> fornecedores = identificadorFornecedor(b);
+					ArrayList<String> fornecedores = identificadorFornecedor(b);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -226,7 +226,7 @@ public class Tela extends JFrame {
 	return fornecedores;	
 	}
 	
-	public ArrayList<Integer> contadorModalidade(String ug, String[][] dados){
+	public ArrayList<Float> contadorModalidade(String ug, String[][] dados){
 		int qtdeLinhas = dados.length;
 		int contadorDispensa = 0;
 		int contadorDispensaTotal = 0;
@@ -254,15 +254,61 @@ public class Tela extends JFrame {
 				}
 			}
 		}
-		ArrayList<Integer> contadores = new ArrayList<Integer>();
-		contadores.add(contadorDispensa);
-		contadores.add(contadorPregaoP);
-		contadores.add(contadorInegibilidade);
-		contadores.add(contadorDispensaTotal);
-		contadores.add(contadorPregoPTotal);
-		contadores.add(contadorInegibilidadeTotal);
+		
+		ArrayList<Float> contadores = new ArrayList<Float>();
+		float temp = contadorDispensa/contadorDispensaTotal;
+		
+		contadores.add(temp);
+		temp = contadorPregaoP/contadorPregoPTotal;
+		contadores.add(temp);
+		temp = contadorInegibilidade/contadorInegibilidadeTotal;
+		contadores.add(temp);
+		
 		return contadores;
 	} 
+	
+	public ArrayList<String[]> motorInferenciaUG(String[][] dados){
+		ArrayList<String[]> indiciosUG = new ArrayList<String[]>();
+		ArrayList<String> ugs = identificadorUG(dados);
+		ArrayList<Float> contadorModalidade = new ArrayList<Float>();
+		
+		for (String i : ugs) {
+			String[] detalhesUG = new String[ugs.size()];
+			int posicaoVetorDetalhes = 0;
+			contadorModalidade = contadorModalidade(i, dados);
+			//Regra de modalidades de aquisição de itens
+			if (contadorModalidade.get(0) > 0.4) {
+				if (detalhesUG.length == 0){
+					detalhesUG[posicaoVetorDetalhes] = i;
+					posicaoVetorDetalhes++;
+				}
+				detalhesUG[posicaoVetorDetalhes] = contadorModalidade.get(0).toString();
+				posicaoVetorDetalhes++;
+			}
+			if (contadorModalidade.get(1) > 0.1) {
+				if (detalhesUG.length == 0){
+					detalhesUG[posicaoVetorDetalhes] = i;
+					posicaoVetorDetalhes++;
+				}
+				detalhesUG[posicaoVetorDetalhes] = contadorModalidade.get(1).toString();
+				posicaoVetorDetalhes++;
+			}
+			if (contadorModalidade.get(2) > 0.01) {
+				if (detalhesUG.length == 0){
+					detalhesUG[posicaoVetorDetalhes] = i;
+					posicaoVetorDetalhes++;
+				}
+				detalhesUG[posicaoVetorDetalhes] = contadorModalidade.get(2).toString();
+				posicaoVetorDetalhes++;
+			}
+			
+			indiciosUG.add(detalhesUG);
+		}
+		
+		
+		
+		return indiciosUG;
+	}
 		
 	
 	
