@@ -62,13 +62,6 @@ public class Tela extends JFrame {
 					String[][] b = manipularExcel(a.getAbsolutePath());
 					ArrayList<String> ugs = identificadorUG(b);
 					//ArrayList<String> fornecedores = identificadorFornecedor(b);
-//					for (String i : ugs){
-//						//motor de inferencia
-//					}
-//					for (String i : fornecedores) {
-//						//motor de inferencia
-//					}
-					//chamar identificador de Fornecedores
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -116,7 +109,7 @@ public class Tela extends JFrame {
 	        buffRead.close();
 		
 	        //Reduz o .csv as linhas que são importantes para as regras
-	        String[][] matrizDados = new String [linhas.size()][13];
+	        String[][] matrizDados = new String [linhas.size() + 1][13];
 	        int contadorLinhas = 0;
 	        int contadorColunas = 0;
 	        
@@ -189,7 +182,7 @@ public class Tela extends JFrame {
 		ArrayList<String> ugs = new ArrayList<String>();
 		String codUg = "";
 		
-		for (int i = 0; i <= qtdeLinhas; i++) {
+		for (int i = 0; i < qtdeLinhas; i++) {
 			boolean jaExiste = false;
 			codUg = dados[i][3];
 			for (String j : ugs) {
@@ -203,7 +196,7 @@ public class Tela extends JFrame {
 			if (jaExiste == false){
 				ugs.add(codUg);
 			}
-			i++;	
+			
 		}
 		
 	return ugs;	
@@ -214,7 +207,7 @@ public class Tela extends JFrame {
 		ArrayList<String> fornecedores = new ArrayList<String>();
 		String codFornecedor = "";
 		
-		for (int i = 0; i <= qtdeLinhas; i++) {
+		for (int i = 0; i < qtdeLinhas; i++) {
 			boolean jaExiste = false;
 			codFornecedor = dados[i][3];
 			for (String j : fornecedores) {
@@ -233,17 +226,25 @@ public class Tela extends JFrame {
 	return fornecedores;	
 	}
 	
-	public ArrayList<String> motorDeInferenciaFornecedor(String fornecedor, String[][] dados){
-		int qtdeColunas = dados[0].length;
+	public ArrayList<Integer> contadorModalidade(String ug, String[][] dados){
 		int qtdeLinhas = dados.length;
-		ArrayList<String> notasFornecedor = new ArrayList<String>();
 		int contadorDispensa = 0;
+		int contadorDispensaTotal = 0;
 		int contadorPregaoP = 0;
+		int contadorPregoPTotal = 0;
 		int contadorInegibilidade = 0;
+		int contadorInegibilidadeTotal = 0;
 		
 		for (int i = 0; i <= qtdeLinhas; i++) {
-			String fornecedorAtual= dados[i][4];
-			if (fornecedor.equals(fornecedorAtual)) {
+			String ugAtual= dados[i][4];
+			if (dados[i][0] == "8"){
+				contadorDispensaTotal++;
+			} else if (dados[i][0] == "6") {
+				contadorPregoPTotal++;
+			} else if (dados[i][0] == "10") {
+				contadorInegibilidadeTotal++;
+			}
+			if (ug.equals(ugAtual)) {
 				if (dados[i][0] == "8") {
 					contadorDispensa++;
 				} else if (dados[i][0] == "6") {
@@ -253,7 +254,14 @@ public class Tela extends JFrame {
 				}
 			}
 		}
-		return notasFornecedor;
+		ArrayList<Integer> contadores = new ArrayList<Integer>();
+		contadores.add(contadorDispensa);
+		contadores.add(contadorPregaoP);
+		contadores.add(contadorInegibilidade);
+		contadores.add(contadorDispensaTotal);
+		contadores.add(contadorPregoPTotal);
+		contadores.add(contadorInegibilidadeTotal);
+		return contadores;
 	} 
 		
 	
