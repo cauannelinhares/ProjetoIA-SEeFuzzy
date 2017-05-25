@@ -62,6 +62,9 @@ public class Tela extends JFrame {
 					String[][] b = manipularExcel(a.getAbsolutePath());
 					ArrayList<String> ugs = identificadorUG(b);
 					ArrayList<String> fornecedores = identificadorFornecedor(b);
+			
+						System.out.println(ugs);
+					
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -176,53 +179,34 @@ public class Tela extends JFrame {
 		
 	}
 	
+	//Pegar array com as UGs existentes no .csv sem repetição
 	public ArrayList<String> identificadorUG (String[][] dados) {
-		int qtdeColunas = dados[0].length;
 		int qtdeLinhas = dados.length;
 		ArrayList<String> ugs = new ArrayList<String>();
 		String codUg = "";
 		
 		for (int i = 0; i < qtdeLinhas; i++) {
-			boolean jaExiste = false;
 			codUg = dados[i][3];
-			for (String j : ugs) {
-				if (codUg == j) {
-					jaExiste = true;
-					break;
-				} else {
-					jaExiste = false;
-				}
-			}
-			if (jaExiste == false){
+			if (!ugs.contains(codUg)){
 				ugs.add(codUg);
 			}
-			
 		}
 		
 	return ugs;	
 	}
 	
+	//Pegar array com os Fronecedores existentes no .csv sem repetição
 	public ArrayList<String> identificadorFornecedor (String[][] dados) {
 		int qtdeLinhas = dados.length;
 		ArrayList<String> fornecedores = new ArrayList<String>();
 		String codFornecedor = "";
 		
 		for (int i = 0; i < qtdeLinhas; i++) {
-			boolean jaExiste = false;
-			codFornecedor = dados[i][3];
-			for (String j : fornecedores) {
-				if (codFornecedor == j) {
-					jaExiste = true;
-					break;
-				} else {
-					jaExiste = false;
-				}
-			}
-			if (jaExiste == false){
+			codFornecedor = dados[i][4];
+			if (!fornecedores.contains(codFornecedor)){
 				fornecedores.add(codFornecedor);
-			}	
+			}
 		}
-		
 	return fornecedores;	
 	}
 	
@@ -234,6 +218,7 @@ public class Tela extends JFrame {
 		int contadorPregoPTotal = 0;
 		int contadorInegibilidade = 0;
 		int contadorInegibilidadeTotal = 0;
+		int contadorLicitacoesNaUG = 0;
 		
 		for (int i = 0; i <= qtdeLinhas; i++) {
 			String ugAtual= dados[i][4];
@@ -252,17 +237,27 @@ public class Tela extends JFrame {
 				} else if (dados[i][0] == "10") {
 					contadorInegibilidade++;
 				}
+				contadorLicitacoesNaUG++;
 			}
 		}
 		
 		ArrayList<Float> contadores = new ArrayList<Float>();
-		float temp = contadorDispensa/contadorDispensaTotal;
 		
-		contadores.add(temp);
-		temp = contadorPregaoP/contadorPregoPTotal;
-		contadores.add(temp);
-		temp = contadorInegibilidade/contadorInegibilidadeTotal;
-		contadores.add(temp);
+		//Percentual modalidade na UG
+		float tempUG = contadorDispensa/contadorLicitacoesNaUG;
+		contadores.add(0, tempUG);
+		tempUG = contadorInegibilidade/contadorLicitacoesNaUG;
+		contadores.add(1, tempUG);
+		tempUG = contadorPregaoP/contadorLicitacoesNaUG;
+		contadores.add(2,  tempUG);
+		
+		//Percentual modalidade da UG com relação ao total
+		float tempTotal = contadorDispensa/contadorDispensaTotal;
+		contadores.add(tempTotal);
+		tempTotal = contadorPregaoP/contadorPregoPTotal;
+		contadores.add(tempTotal);
+		tempTotal = contadorInegibilidade/contadorInegibilidadeTotal;
+		contadores.add(tempTotal);
 		
 		return contadores;
 	} 
@@ -274,32 +269,36 @@ public class Tela extends JFrame {
 		
 		for (String i : ugs) {
 			String[] detalhesUG = new String[ugs.size()];
-			int posicaoVetorDetalhes = 0;
 			contadorModalidade = contadorModalidade(i, dados);
+			
 			//Regra de modalidades de aquisição de itens
-			if (contadorModalidade.get(0) > 0.4) {
+			if (contadorModalidade.get(0) > 0.5) {
 				if (detalhesUG.length == 0){
-					detalhesUG[posicaoVetorDetalhes] = i;
-					posicaoVetorDetalhes++;
+					detalhesUG[0] = i;
 				}
-				detalhesUG[posicaoVetorDetalhes] = contadorModalidade.get(0).toString();
-				posicaoVetorDetalhes++;
+				detalhesUG[0] = contadorModalidade.get(0).toString();
+			} else {
+				detalhesUG[0] = null;
 			}
 			if (contadorModalidade.get(1) > 0.1) {
 				if (detalhesUG.length == 0){
-					detalhesUG[posicaoVetorDetalhes] = i;
-					posicaoVetorDetalhes++;
+					detalhesUG[1] = i;
 				}
-				detalhesUG[posicaoVetorDetalhes] = contadorModalidade.get(1).toString();
-				posicaoVetorDetalhes++;
+				detalhesUG[1] = contadorModalidade.get(1).toString();
+			} else {
+				detalhesUG[1] = null;
 			}
 			if (contadorModalidade.get(2) > 0.01) {
 				if (detalhesUG.length == 0){
-					detalhesUG[posicaoVetorDetalhes] = i;
-					posicaoVetorDetalhes++;
+					detalhesUG[2] = i;
 				}
-				detalhesUG[posicaoVetorDetalhes] = contadorModalidade.get(2).toString();
-				posicaoVetorDetalhes++;
+				detalhesUG[2] = contadorModalidade.get(2).toString();
+			} else {
+				detalhesUG[2] = null;
+			}
+			
+			if (contadorModalidade.get(3) > 0.1) {
+				
 			}
 			
 			indiciosUG.add(detalhesUG);
