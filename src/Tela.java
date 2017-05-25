@@ -60,6 +60,15 @@ public class Tela extends JFrame {
 				File a =new Arquivo().escolherArquivos();
 				try {
 					String[][] b = manipularExcel(a.getAbsolutePath());
+					ArrayList<String> ugs = identificadorUG(b);
+					//ArrayList<String> fornecedores = identificadorFornecedor(b);
+//					for (String i : ugs){
+//						//motor de inferencia
+//					}
+//					for (String i : fornecedores) {
+//						//motor de inferencia
+//					}
+					//chamar identificador de Fornecedores
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -173,5 +182,80 @@ public class Tela extends JFrame {
 		System.out.println(qtdeLinhas + qtdeColunas);
 		
 	}
+	
+	public ArrayList<String> identificadorUG (String[][] dados) {
+		int qtdeColunas = dados[0].length;
+		int qtdeLinhas = dados.length;
+		ArrayList<String> ugs = new ArrayList<String>();
+		String codUg = "";
+		
+		for (int i = 0; i <= qtdeLinhas; i++) {
+			boolean jaExiste = false;
+			codUg = dados[i][3];
+			for (String j : ugs) {
+				if (codUg == j) {
+					jaExiste = true;
+					break;
+				} else {
+					jaExiste = false;
+				}
+			}
+			if (jaExiste == false){
+				ugs.add(codUg);
+			}
+			i++;	
+		}
+		
+	return ugs;	
+	}
+	
+	public ArrayList<String> identificadorFornecedor (String[][] dados) {
+		int qtdeLinhas = dados.length;
+		ArrayList<String> fornecedores = new ArrayList<String>();
+		String codFornecedor = "";
+		
+		for (int i = 0; i <= qtdeLinhas; i++) {
+			boolean jaExiste = false;
+			codFornecedor = dados[i][3];
+			for (String j : fornecedores) {
+				if (codFornecedor == j) {
+					jaExiste = true;
+					break;
+				} else {
+					jaExiste = false;
+				}
+			}
+			if (jaExiste == false){
+				fornecedores.add(codFornecedor);
+			}	
+		}
+		
+	return fornecedores;	
+	}
+	
+	public ArrayList<String> motorDeInferenciaFornecedor(String fornecedor, String[][] dados){
+		int qtdeColunas = dados[0].length;
+		int qtdeLinhas = dados.length;
+		ArrayList<String> notasFornecedor = new ArrayList<String>();
+		int contadorDispensa = 0;
+		int contadorPregaoP = 0;
+		int contadorInegibilidade = 0;
+		
+		for (int i = 0; i <= qtdeLinhas; i++) {
+			String fornecedorAtual= dados[i][4];
+			if (fornecedor.equals(fornecedorAtual)) {
+				if (dados[i][0] == "8") {
+					contadorDispensa++;
+				} else if (dados[i][0] == "6") {
+					contadorPregaoP++;
+				} else if (dados[i][0] == "10") {
+					contadorInegibilidade++;
+				}
+			}
+		}
+		return notasFornecedor;
+	} 
+		
+	
 	
 }
