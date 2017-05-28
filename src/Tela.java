@@ -96,11 +96,18 @@ public class Tela extends JFrame {
                     System.out.println("contadores:");
                     System.out.println(somaContadorModalidadeUG(ugs.get(1), b));
                     
+                    System.out.println("CodUG|VLmedItem|Soma Modalidades");
                     imprimire(motorInferenciaUG(b));
                     
-                    System.out.println("--------------------");
+                    System.out.println("===========================================================");
                     
+                    System.out.println("CodFornecedor|VlMedItem item|SomaModalidades");
                     imprimire(motorInferenciaFornecedor(b));
+                    
+                    System.out.println("===========================================================");
+                    
+                    System.out.println("CodFornecedor|Classificacao|Nota");
+                    imprimire(motorInferenciaFornecedorSE(b));
                    
  
                 } catch (IOException e) {
@@ -824,7 +831,6 @@ public class Tela extends JFrame {
         ArrayList<String> fornecedores = identificadorFornecedor(dados);
         dados = calcularValorTotalItem(dados);
        
-        //imprimir(ugs);
         float mediaParticipantesGeral = mediaParticipantes(dados);
  
         for (String i : fornecedores) {
@@ -854,14 +860,14 @@ public class Tela extends JFrame {
             	flag = true;
             }
             
-            if (frequencia > 0.51){
+            if (frequencia > 0.50){
                 flag = true;
             }
            
             if (flag == true){
                 detalhesFornecedor[0] = i;
-                detalhesFornecedor[1] = String.valueOf(frequenciaMax(mediaItemUG(i, dados)));
-                detalhesFornecedor[2] = String.valueOf(somaContadorModalidadeUG(i, dados));
+                detalhesFornecedor[1] = String.valueOf(frequenciaMax(mediaItemFornecedor(i, dados)));
+                detalhesFornecedor[2] = String.valueOf(somaContadorModalidadeFornecedor(i, dados));
 
                 indiciosFornecedor.add(detalhesFornecedor);
             }
@@ -936,7 +942,89 @@ public class Tela extends JFrame {
     }
     
     */
+
+    public ArrayList<String[]> motorInferenciaFornecedorSE(String[][] dados){
+        ArrayList<String[]> indiciosFornecedor = new ArrayList<String[]>();
+        ArrayList<String> fornecedores = identificadorFornecedor(dados);
+        dados = calcularValorTotalItem(dados);
+        
+        float mediaParticipantesGeral = mediaParticipantes(dados);
  
+        for (String i : fornecedores) {
+            String[] detalhesFornecedor = new String[3];
+
+            float acumuladorNotas = 0;
+            
+            //Regra de modalidades de aquisicaoo de iten
+            
+            float soma = somaContadorModalidadeFornecedor(i, dados);
+            float contadorLicitacao = contadorLicitacaoFornecedor(i, dados);
+            soma = (float) soma / contadorLicitacao;
+            float frequencia = frequenciaMax(frequenciaUgVencedorFornecedor(i, dados));
+            frequencia = (float) frequencia / contadorLicitacao;
+            float outras = contadorOutrasColocacoes(i, dados);
+            outras = (float) outras / contadorLicitacao;
+            
+            String[][] med = mediaItemFornecedor(i, dados);
+            
+            for(String[] m: med){
+            	
+            	int qtdLinhas = dados.length;
+            	
+            	for(int l =0; l<qtdLinhas; l++){
+            			if(dados[l][4].equals(i)&&dados[l][9].equals(m[0])
+            					&&(Float.parseFloat(dados[l][6])>Float.parseFloat(m[1])*1.5)){
+            						acumuladorNotas += 9;
+            			}
+            	}
+            	
+            	
+            	
+            }
+            
+            if (soma > 0.9) {
+                acumuladorNotas += 5;
+            }
+            
+            if (outras > 0.2) {
+            	acumuladorNotas += 1;
+            }
+            
+            if (mediaParticipantesPorFornecedor(i, dados) < 1.5 * mediaParticipantesGeral) {
+            	acumuladorNotas += 2;
+            }
+            
+            if (frequencia > 0.50){
+                acumuladorNotas += 4;
+            }
+            
+            //21 e a soma dos pesos das regras, ao inserir outras regras somar pesos
+            float mediaPonderada = (float) acumuladorNotas / 21;
+            String classificacao = "";
+            if (acumuladorNotas <= 4) {
+            	classificacao = "OTIMO";
+            } else if (acumuladorNotas > 4 && acumuladorNotas <= 8) {
+            	classificacao = "BOM";
+            } else if (acumuladorNotas > 8 && acumuladorNotas <= 12) {
+            	classificacao = "REGULAR";
+            } else if (acumuladorNotas > 12 && acumuladorNotas <= 16) {
+            	classificacao = "RUIM";
+            } else if (acumuladorNotas > 16) {
+            	
+            }
+            
+            detalhesFornecedor[0] = i;
+            detalhesFornecedor[1] = classificacao;
+            detalhesFornecedor[2] = String.valueOf(mediaPonderada);
+
+            indiciosFornecedor.add(detalhesFornecedor);
+            }
+           
+        return indiciosFornecedor;
+    }
+
+
+    
     public void imprimir (ArrayList<String> d){
         for(String s: d ) {
             System.out.println(s.toString());
@@ -955,9 +1043,9 @@ public class Tela extends JFrame {
         for(String[] s: d ) {
             for(String ss: s){
                 System.out.print(ss.toString());
-                System.out.print("  ");
+                System.out.print("|");
             }
-            System.out.println("FIM LINHA");
+            System.out.println("");
         }  
        
     }
